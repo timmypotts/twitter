@@ -2,11 +2,12 @@ import pandas as pd
 import numpy as np
 import re
 import nltk
+import plotly.express as px
 
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
-from wordcloud import WordCloud, STOPWORDS
+from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
 from sklearn.feature_extraction.text import CountVectorizer
@@ -24,13 +25,16 @@ def remove_content(text):
     text =re.sub(r'\#\w+','',text) #remove hashtags
     return text
 def process_text(text, stem=False): #clean text
-    stop_words = set(stopwords.words('english'))
+    stopwords = nltk.corpus.stopwords.words('english')
+    newStopWords = ['like', 'much', 'lol', 'one', 'think', 'would', 'going', 'really', 'yeah', 'go', 'say', ]
+    stopwords.extend(newStopWords)
+    print(stopwords)
     text=remove_content(text)
     text = re.sub('[^A-Za-z]', ' ', text.lower()) #remove non-alphabets
     tokenized_text = word_tokenize(text) #tokenize
     clean_text = [
          word for word in tokenized_text
-         if word not in stop_words
+         if word not in stopwords
     ]
     if stem:
         clean_text=[stemmer.stem(word) for word in clean_text]
@@ -59,4 +63,6 @@ def plot_topn(sentences, ngram_range=(1,3), top=20,firstword=''):
     plt.update_layout(yaxis_title='count',xaxis_title='Phrases')
     plt.show()
 
-plot_topn(temp, ngram_range=(1,1))
+plot_topn(df['cleaned_tweets'], ngram_range=(1,1))
+plot_topn(df['cleaned_tweets'], ngram_range=(2,2))
+plot_topn(df['cleaned_tweets'], ngram_range=(3,3))
